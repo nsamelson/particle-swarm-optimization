@@ -18,6 +18,7 @@ class Ball {
         
         void updatePosition(float dt);
         void updateVelocity(Vector3 g_best,Vector3 r_p,Vector3 r_g,float c0,float c1,float w);
+        Vector3 updateFitness(Vector3 global_best);
 
         // void avoidCube(Vector3 cubePos,Vector3 cubeDim);
         // void collideWithCube(Vector3 cubePos,Vector3 cubeDim);

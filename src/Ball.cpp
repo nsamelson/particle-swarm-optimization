@@ -13,20 +13,22 @@ Ball::Ball(Vector3 position, Vector3 bestPersonal, Vector3 speed,float radius) {
 
 }
 
-
+Vector3 Ball::updateFitness(Vector3 global_best){
+    if (position.y < bestPersonal.y){
+        bestPersonal = position;
+        if(bestPersonal.y < global_best.y){
+                global_best = bestPersonal;
+            }
+    }
+    return global_best;
+    
+}
 void Ball::updatePosition(float dt){
 
     position.x += speed.x * dt;
     position.y += speed.y * dt; 
     position.z += speed.z * dt;
 
-    if (position.y < bestPersonal.y){
-        bestPersonal = position;
-        isNewBest = true;
-    }
-    else{
-        isNewBest = false;
-    }
 
 }
 void Ball::updateVelocity(Vector3 g_best,Vector3 r_p,Vector3 r_g,float c0=2.0f,float c1=2.0f,float w=0.9f){

@@ -3,10 +3,10 @@
 #include <array>
 #include <string>
 #include <raymath.h>
-#include "Particles.h"
 #include <ctime>
 #include <cstdlib>
-#include "Perlin.h"
+#include "src/Particles.h"
+#include "src/Perlin.h"
 
 int main(void)
 {
@@ -46,39 +46,20 @@ int main(void)
     int freq = 1;
     int depth = 1;
     float scale = 1.0f;
-    bool update = false;
+    bool update = true;
     bool info = true;   
 
     //Swarm
 
     Particles particles = Particles(100);
+    int factor = 2;
 
     //create map :
     int size = 30;
     float semisize = size/2;
 
-    float map[size][size];
-
-    int factor = 2;
-
-    for (int x = 0; x < size; x++)
-    {
-        for (int y = 0; y < size; y++)
-        {
-            float z = terrain.perlin2d(x * scale, y * scale, freq / 10.0f, depth) * 10;
-            map[x][y] = z;
-
-            float random_height = static_cast <float> (rand()) / static_cast <float> (RAND_MAX); //0 to 1
-
-
-            
-            if (x %factor == 0 and y % factor == 0){
-                particles.init_position((float)(x - semisize) /2.0f, (float)z *1.5f+ random_height * 5, (float)(y - semisize)/2.0f );
-
-            }
-        }
-    }
-    
+    float map[size][size];    
+   
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //----------------------------------------------------------

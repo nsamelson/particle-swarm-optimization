@@ -61,14 +61,8 @@ void Particles::move_particles(float dt){
         Vector3 random_personal = {rp1,rp2,rp3};
         Vector3 random_global = {rg1,rg2,rg3};
 
-        if(particles[i].getIsNewBesst()){
-            Vector3 best_particle_pos = particles[i].getBestPosition();
-
-            if(best_particle_pos.y < global_best.y){
-                global_best = best_particle_pos;
-            }
-        }
-
+        
+        global_best = particles[i].updateFitness(global_best);
         particles[i].updateVelocity(global_best,random_personal, random_global,c1,c2,w);        
         particles[i].updatePosition(dt);
     }
