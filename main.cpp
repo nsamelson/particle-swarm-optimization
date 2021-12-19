@@ -5,6 +5,8 @@
 #include <raymath.h>
 #include <ctime>
 #include <cstdlib>
+#include <math.h>
+
 #include "src/Particles.h"
 #include "src/Perlin.h"
 
@@ -24,7 +26,8 @@ int main(void)
     srand(time(0));
 
     //map
-    Perlin terrain = Perlin();
+    // Perlin terrain = Perlin();
+    bool isPerlin = false;
 
     
     //Pause game
@@ -73,6 +76,7 @@ int main(void)
 
         //keys
         if (IsKeyPressed(KEY_UP)) { freq++; update = true; }
+        if (IsKeyPressed(KEY_P)) { isPerlin = !isPerlin; update = true; }
         if (IsKeyPressed(KEY_DOWN)) { freq--; update = true; }
         if (IsKeyPressed(KEY_LEFT)) { depth++; update = true; }
         if (IsKeyPressed(KEY_RIGHT)) { depth--; update = true; }
@@ -87,21 +91,32 @@ int main(void)
 
         if (update)
         {
-            particles.empty_vector();
+            // particles.empty_vector();
 
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
                 {
-                    float z = terrain.perlin2d(x * scale, y * scale, freq / 10.0f, depth) * 10;
-                    map[x][y] = z;
+                    
+                    //float z;
+                    // if(isPerlin){
+                    //     z = terrain.perlin2d(x * scale, y * scale, freq / 10.0f, depth) * 10;
+                    // }
+                    // else{
+                    //     float xi = float(x / 10.0f) + 1.50f;
+                    //     float yi = float(y / 10.0f) + 1.50f;
+                    //     z = pow(xi - 3.14,2)+ pow(yi - 2.72,2) + sin(3*xi + 1.41) + sin(4*yi - 1.73) + 2.0f;
+                    // }
+                    float xi = float(x / 10.0f) + 1.50f;
+                    float yi = float(y / 10.0f) + 1.50f;
 
-                    float random_height = static_cast <float> (rand()) / static_cast <float> (RAND_MAX); //0 to 1
-
-
+                    float h;
+                    h = pow(xi - 3.14,2)+ pow(yi - 2.72,2) + sin(3*xi + 1.41) + sin(4*yi - 1.73) + 2.0f;
+                                        
+                    map[x][y] = h;
                     
                     if (x %factor == 0 and y % factor == 0){
-                        particles.init_position((float)(x - semisize) /2.0f, (float)z *1.5f+ random_height * 5, (float)(y - semisize)/2.0f );
+                        particles.init_position(float(x), h ,float(y));
 
                     }
                 }
@@ -117,7 +132,7 @@ int main(void)
             delta += dt;
             iteration +=1;
 
-            particles.move_particles(dt);
+            particles.move_particles(dt,iteration);
 
 
         }
@@ -148,7 +163,9 @@ int main(void)
                                     (Color) { (unsigned char)((map[x][y] / 10) * 255),(unsigned char) ((map[x][y] / 10) * 255), (unsigned char)((map[x][y] / 10) * 255), 255 });
 
                         if (x %factor == 0 and y % factor == 0){
-                            DrawSphere(particles.get_particles()[i].getPosition(), particles.get_particles()[i].getRadius(), BLUE);
+                            Vector3 pos = particles.get_particles()[i].getPosition();
+                            Vector3 newPos = {(float)(pos.x - semisize) /2.0f, 12.0f, (float)(pos.z - semisize)/2.0f};
+                            DrawSphere(newPos, particles.get_particles()[i].getRadius(), BLUE);
                             i++;
 
                         }
@@ -172,12 +189,15 @@ int main(void)
             if (pause && ((framesCounter/30)%2)) DrawText("PAUSED", 350, 200, 30, GRAY);
             if (info)
             {
-                DrawRectangle(10, 10, 200, 130, LIGHTGRAY );
+                Vector3 part = particles.get_g_best();
+                Vector3 newPos = {(float)(part.x - semisize) /2.0f,part.y, (float)(part.z - semisize)/2.0f};
+                DrawRectangle(10, 10, 250, 130, LIGHTGRAY );
                 DrawText(TextFormat("Iterations: %d", iteration), 20, 20, 15, BLACK);
-                DrawText(TextFormat("W: %0.001f", particles.w), 20, 40, 15, BLACK);
-                DrawText(TextFormat("c1: %0.1f", particles.c1), 20, 60, 15, BLACK);
-                DrawText(TextFormat("c2: %0.1f", particles.c2), 20, 80, 15, BLACK);
-                DrawFPS(20, 100);
+                DrawText(TextFormat("Global best: (%0.2f, %0.2f, %0.2f)", newPos.x,newPos.y,newPos.z), 20, 40, 15, BLACK);
+                DrawText(TextFormat("W: %0.5f", particles.get_w()), 20, 60, 15, BLACK);
+                DrawText(TextFormat("c1: %0.2f", particles.get_c1()), 20, 80, 15, BLACK);
+                DrawText(TextFormat("c2: %0.2f", particles.get_c2()), 20, 100, 15, BLACK);
+                DrawFPS(20, 120);
 
                 
             }
